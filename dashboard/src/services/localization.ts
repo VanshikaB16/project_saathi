@@ -2691,25 +2691,25 @@ export function getDynamicAudioGreeting(
     case 'hi': {
       if (f === 0 && r === 0) {
         return {
-          text: 'नमस्ते आशा दीदी। आज कोई फॉलो-अप और कोई रेफरल लंबित नहीं है। आपके सभी कार्य पूरे हो चुके हैं।',
-          phonetic: 'Namaste ASHA didi. Aaj koi follow-up aur koi referral lambit nahi hai. Aapke sabhi karya poore ho chuke hain.',
+          text: 'नमस्ते आशा दीदी। आज आपकी कार्य सूची में 0 फॉलो-अप और 0 अस्पताल रेफरल लंबित हैं। आपके सभी कार्य पूरे हैं। नया मरीज़ जाँचने के लिए नीचे जाँच शुरू करें बटन दबाएं।',
+          phonetic: 'Namaste ASHA didi. Aaj aapki karya soochi mein zero follow-up aur zero hospital referral lambit hain. Aapke sabhi karya poore hain. Naya mareez jaanchne ke liye neeche jaanch shuru karein button dabayein.',
         };
       }
       if (f > 0 && r === 0) {
         return {
-          text: `नमस्ते आशा दीदी। आज आपके क्षेत्र में ${f} ${f === 1 ? 'व्यक्ति' : 'लोगों'} का फॉलो-अप बाकी है और कोई रेफरल लंबित नहीं है।`,
-          phonetic: `Namaste ASHA didi. Aaj aapke kshetra mein ${f} ${f === 1 ? 'vyakti' : 'logon'} ka follow-up baaki hai aur koi referral lambit nahi hai.`,
+          text: `नमस्ते आशा दीदी। आज आपकी कार्य सूची में ${f} मरीज़ों का फॉलो-अप पुनः जाँच बाकी है, और 0 अस्पताल रेफरल लंबित हैं। कृपया कार्य सूची देखें।`,
+          phonetic: `Namaste ASHA didi. Aaj aapki karya soochi mein ${f} mareezon ka follow-up punaah jaanch baaki hai, aur zero hospital referral lambit hain. Kripya karya soochi dekhein.`,
         };
       }
       if (f === 0 && r > 0) {
         return {
-          text: `नमस्ते आशा दीदी। आज सभी फॉलो-अप पूरे हैं, और ${r} रेफरल अस्पताल रिपोर्ट की प्रतीक्षा में ${r === 1 ? 'है' : 'हैं'}।`,
-          phonetic: `Namaste ASHA didi. Aaj sabhi follow-up poore hain, aur ${r} referral hospital report ki pratiksha mein ${r === 1 ? 'hai' : 'hain'}.`,
+          text: `नमस्ते आशा दीदी। आज 0 फॉलो-अप बाकी हैं, और ${r} अस्पताल रेफरल डॉक्टर की रिपोर्ट की प्रतीक्षा में हैं। कृपया रेफरल सूची देखें।`,
+          phonetic: `Namaste ASHA didi. Aaj zero follow-up baaki hain, aur ${r} hospital referral doctor ki report ki pratiksha mein hain. Kripya referral soochi dekhein.`,
         };
       }
       return {
-        text: `नमस्ते आशा दीदी। आज आपके क्षेत्र में ${f} ${f === 1 ? 'व्यक्ति' : 'लोगों'} का फॉलो-अप बाकी है और ${r} रेफरल अस्पताल रिपोर्ट की प्रतीक्षा में ${r === 1 ? 'है' : 'हैं'}।`,
-        phonetic: `Namaste ASHA didi. Aaj aapke kshetra mein ${f} ${f === 1 ? 'vyakti' : 'logon'} ka follow-up baaki hai aur ${r} referral hospital report ki pratiksha mein ${r === 1 ? 'hai' : 'hain'}.`,
+        text: `नमस्ते आशा दीदी। आज आपकी कार्य सूची में ${f} मरीज़ों का फॉलो-अप पुनः जाँच बाकी है, और ${r} अस्पताल रेफरल डॉक्टर की रिपोर्ट की प्रतीक्षा में हैं। कृपया कार्य सूची देखें।`,
+        phonetic: `Namaste ASHA didi. Aaj aapki karya soochi mein ${f} mareezon ka follow-up punaah jaanch baaki hai, aur ${r} hospital referral doctor ki report ki pratiksha mein hain. Kripya karya soochi dekhein.`,
       };
     }
 

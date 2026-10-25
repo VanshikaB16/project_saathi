@@ -140,7 +140,7 @@ export interface DoctorMobileTexts {
 // 1. Role Login Dictionaries
 const ROLE_LOGIN_I18N: Record<string, RoleLoginTexts> = {
   hi: {
-    appTitle: 'प्रोजेक्ट साथी (Project Saathi)',
+    appTitle: 'प्रोजेक्ट साथी',
     tagline: 'ग्रामीण प्राथमिक स्वास्थ्य एवं रेफरल नेटवर्क',
     step1Title: 'चरण 1: अपनी क्लिनिकल भूमिका चुनें',
     audioPrompt: 'प्रोजेक्ट साथी में आपका स्वागत है। कृपया चुनें कि आप आशा कार्यकर्ता हैं या डॉक्टर, एवं अपनी अधिकृत पहचान दर्ज करें।',
@@ -560,7 +560,7 @@ const ROLE_LOGIN_I18N: Record<string, RoleLoginTexts> = {
     validationNmrReq: 'ದಯವಿಟ್ಟು NMR ID ನಮೂದಿಸಿ',
   },
   sd: {
-    appTitle: 'प्रोजेक्ट साथी (Project Saathi)',
+    appTitle: 'प्रोजेक्ट साथी',
     tagline: 'संभाळ जे वधीक वेझो। सेहत जे पासे पहिरियों कदम।',
     step1Title: 'चरण 1: पहिंजी क्लिनिकल भूमिका चुंडियो',
     audioPrompt: 'प्रोजेक्ट साथी में तव्हांजो सुआगतु आहि। मिहरबानी करे चुंडियो त तव्हां आशा कार्यकरती आहियो या डॉक्टर, ऐं पहिंजी पञ्जीकृत शनाख़्त दर्ज करियो।',
@@ -607,7 +607,7 @@ const ROLE_LOGIN_I18N: Record<string, RoleLoginTexts> = {
   },
 
   mai: {
-    appTitle: 'प्रोजेक्ट साथी (Project Saathi)',
+    appTitle: 'प्रोजेक्ट साथी',
     tagline: 'देखभालक किछु नज़दीक। स्वास्थ्य दिस पहिल कदम।',
     step1Title: 'चरण १: अपन क्लिनिकल भूमिका चुनू',
     audioPrompt: 'प्रोजेक्ट साथी मे अहाँक स्वागत अछि। कृपा कऽ चुनू जे अहाँ आशा कार्यकर्ता छी या डॉक्टर, आ अपन अधिकृत पहचान दर्ज करू।',
@@ -654,7 +654,7 @@ const ROLE_LOGIN_I18N: Record<string, RoleLoginTexts> = {
   },
 
   brx: {
-    appTitle: 'प्रोजेक्ट साथी (Project Saathi)',
+    appTitle: 'प्रोजेक्ट साथी',
     tagline: 'फाहामनायनि खाथिराव। साबसिन सावस्रिनि थाखाय सेथि आगान।',
     step1Title: 'आगान 1: नोंथांनि क्लिनिकल बिबान सायख\'',
     audioPrompt: 'प्रोजेक्ट साथियाव नोंथांखौ बरायबाय। नोंथाङा आशा मावथि ना डक्टर सायख\' आरो गावनि मुंथिसननाय लिर।',
@@ -936,7 +936,7 @@ const ROLE_LOGIN_I18N: Record<string, RoleLoginTexts> = {
   },
 
   ne: {
-    appTitle: 'प्रोजेक्ट साथी (Project Saathi)',
+    appTitle: 'प्रोजेक्ट साथी',
     tagline: 'ग्रामीण प्राथमिक स्वास्थ्य तथा रेफरल सञ्जाल',
     step1Title: 'चरण १: आफ्नो क्लिनिकल भूमिका छान्नुहोस्',
     audioPrompt: 'प्रोजेक्ट साथीमा स्वागत छ। कृपया तपाईं आशा कार्यकर्ता हुनुहुन्छ वा डाक्टर रोज्नुहोस्।',
@@ -983,7 +983,7 @@ const ROLE_LOGIN_I18N: Record<string, RoleLoginTexts> = {
   },
 
   sa: {
-    appTitle: 'प्रोजेक्ट साथी (Project Saathi)',
+    appTitle: 'प्रोजेक्ट साथी',
     tagline: 'ग्रामीण-प्राथमिक-स्वास्थ्यं प्रेषण-सञ्जालश्च',
     step1Title: 'प्रथमः चरणः: स्वकीयां भूमिकां चिनोतु',
     audioPrompt: 'प्रोजेक्ट साथी मध्ये स्वागतम्। कृपया भवन्तः आशा कार्यकर्त्री अथवा चिकित्सकः इति चिनोतु।',
@@ -1030,7 +1030,7 @@ const ROLE_LOGIN_I18N: Record<string, RoleLoginTexts> = {
   },
 
   doi: {
-    appTitle: 'प्रोजेक्ट साथी (Project Saathi)',
+    appTitle: 'प्रोजेक्ट साथी',
     tagline: 'ग्रामीण प्राथमिक सेहत ते रेफरल नेटवर्क',
     step1Title: 'कदम 1: अपनी भूमिका चुनो',
     audioPrompt: 'प्रोजेक्ट साथी च तुहांदा स्वागत ऐ। मेहरबानी करी चुनो जे तुस आशा कार्यकर्ता ओ या डॉक्टर।',
@@ -1077,7 +1077,7 @@ const ROLE_LOGIN_I18N: Record<string, RoleLoginTexts> = {
   },
 
   ks: {
-    appTitle: 'प्रोजेक्ट साथी (Project Saathi)',
+    appTitle: 'प्रोजेक्ट साथी',
     tagline: 'ग्रामीण प्राथमिक सेहत ते रेफरल नेटवर्क',
     step1Title: 'कदम 1: पनुय किरदार चुनिउ',
     audioPrompt: 'प्रोजेक्ट साथी मंज़ छु तुहुंद खैरमकदम। मेहरबानी करिथ चुनिउ कि तोह्या छिवा आशा वर्कर किन डॉक्टर।',
@@ -1124,7 +1124,7 @@ const ROLE_LOGIN_I18N: Record<string, RoleLoginTexts> = {
   },
 
   kok: {
-    appTitle: 'प्रोजेक्ट साथी (Project Saathi)',
+    appTitle: 'प्रोजेक्ट साथी',
     tagline: 'ग्रामीण प्राथमिक भलायकी आनी संदर्भ नेटवर्क',
     step1Title: 'पायली १: तुमची भूमिका वेंचून काढा',
     audioPrompt: 'प्रोजेक्ट साथींत तुमकां येवकार। उपकार करून तुमी आशा कार्यकर्ती काय डॉक्टर तें वेंचून काढा।',

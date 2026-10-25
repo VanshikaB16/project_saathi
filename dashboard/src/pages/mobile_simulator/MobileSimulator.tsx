@@ -241,6 +241,16 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
     setPendingSyncCount(offlineStore.getPendingSyncCount());
   };
 
+  React.useEffect(() => {
+    refreshStoreState();
+    const unsubscribe = offlineStore.subscribe(() => {
+      refreshStoreState();
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   const openReferrals = referrals.filter((r) => r.status !== 'COMPLETED');
   const pendingFollowups = followups.filter((f) => f.status === 'PENDING');
   const openReferralsCount = openReferrals.length;
@@ -440,9 +450,8 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
     }
 
     // Only speak dynamic pending follow-ups & referrals if verified and logged in as ASHA worker:
-    const targetT = getTranslation(langCode);
     const targetGreeting = getDynamicAudioGreeting(langCode, pendingFollowupsCount, openReferralsCount);
-    speechTts.speak(targetGreeting.text, langCode, targetGreeting.phonetic || targetT.audioGreetingPhonetic);
+    speechTts.speak(targetGreeting.text, langCode, targetGreeting.phonetic || targetGreeting.text);
   };
 
   const handleRegisterPatient = (e: React.FormEvent) => {
@@ -691,7 +700,7 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      speakText(dynamicGreeting.text, dynamicGreeting.phonetic || t.audioGreetingPhonetic);
+                      speakText(dynamicGreeting.text, dynamicGreeting.phonetic || dynamicGreeting.text);
                       setCurrentScreen('home');
                     }}
                     className="w-full py-4 bg-saathi-teal text-white font-bold rounded-2xl text-lg shadow-lg hover:bg-teal-600 active:scale-95 transition-saathi flex items-center justify-center gap-2"
@@ -729,7 +738,7 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
                   </div>
                   <AudioGuidanceButton
                     spokenText={dynamicGreeting.text}
-                    phoneticText={dynamicGreeting.phonetic || t.audioGreetingPhonetic}
+                    phoneticText={dynamicGreeting.phonetic || dynamicGreeting.text}
                     langCode={selectedLanguage}
                     label={
                       selectedLanguage === 'pa'
@@ -768,81 +777,119 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
                     {t.todayTasksHeader}
                   </h4>
 
-                  <button
-                    type="button"
-                    onClick={() => setCurrentScreen('followups')}
-                    className="w-full p-3.5 bg-white rounded-2xl border border-saathi-border text-left shadow-sm flex items-center justify-between hover:border-saathi-teal transition-saathi"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-xl shrink-0 ${pendingFollowupsCount === 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-saathi-amber'}`}>
-                        <Clock className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <strong className="text-sm text-saathi-navy block leading-snug">
-                          {pendingFollowupsCount === 0
-                            ? taskTexts.zeroFollowupsPending
-                            : pendingFollowupsCount === 1
-                            ? taskTexts.singleFollowupPending
-                            : taskTexts.multipleFollowupsPending(pendingFollowupsCount)}
-                        </strong>
-                        <span className="text-xs text-saathi-textSecondary">
-                          {pendingFollowupsCount === 0
-                            ? taskTexts.allFollowupsCompleted
-                            : pendingFollowups[0]
-                            ? `${pendingFollowups[0].villageName} • ${pendingFollowups[0].taskTitle}`
-                            : taskTexts.clinicalWindow7Days}
-                        </span>
-                      </div>
-                    </div>
-                    <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded shrink-0 ${
-                        pendingFollowupsCount === 0
-                          ? 'text-emerald-700 bg-emerald-50'
-                          : 'text-saathi-amber bg-amber-50'
-                      }`}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentScreen('followups')}
+                      className="flex-1 p-3.5 bg-white rounded-2xl border border-saathi-border text-left shadow-sm flex items-center justify-between hover:border-saathi-teal transition-saathi"
                     >
-                      {pendingFollowupsCount === 0
-                        ? taskTexts.completedBadge
-                        : `${t.pendingBadge} (${pendingFollowupsCount})`}
-                    </span>
-                  </button>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-xl shrink-0 ${pendingFollowupsCount === 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-saathi-amber'}`}>
+                          <Clock className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <strong className="text-sm text-saathi-navy block leading-snug">
+                            {pendingFollowupsCount === 0
+                              ? taskTexts.zeroFollowupsPending
+                              : pendingFollowupsCount === 1
+                              ? taskTexts.singleFollowupPending
+                              : taskTexts.multipleFollowupsPending(pendingFollowupsCount)}
+                          </strong>
+                          <span className="text-xs text-saathi-textSecondary">
+                            {pendingFollowupsCount === 0
+                              ? taskTexts.allFollowupsCompleted
+                              : pendingFollowups[0]
+                              ? `${pendingFollowups[0].villageName} • ${pendingFollowups[0].taskTitle}`
+                              : taskTexts.clinicalWindow7Days}
+                          </span>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-xs font-bold px-2 py-0.5 rounded shrink-0 ${
+                          pendingFollowupsCount === 0
+                            ? 'text-emerald-700 bg-emerald-50'
+                            : 'text-saathi-amber bg-amber-50'
+                        }`}
+                      >
+                        {pendingFollowupsCount === 0
+                          ? taskTexts.completedBadge
+                          : `${t.pendingBadge} (${pendingFollowupsCount})`}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const spokenF = isEn
+                          ? `You have ${pendingFollowupsCount} pending follow-up ${pendingFollowupsCount === 1 ? 'task' : 'tasks'}.`
+                          : `आपके पास ${pendingFollowupsCount} फॉलो-अप पुनः जाँच कार्य लंबित हैं।`;
+                        const phoneticF = isEn
+                          ? spokenF
+                          : `Aapke paas ${pendingFollowupsCount} follow-up punaah jaanch karya lambit hain.`;
+                        speakText(spokenF, phoneticF);
+                      }}
+                      className="p-3.5 bg-white rounded-2xl border border-saathi-border text-saathi-teal hover:border-saathi-teal hover:bg-saathi-paleMint/40 transition-saathi shrink-0 shadow-sm flex items-center justify-center"
+                      title={isEn ? "Listen to follow-ups count" : "फॉलो-अप की स्थिति सुनें"}
+                      aria-label="Listen to follow-up status"
+                    >
+                      <Volume2 className="w-5 h-5" />
+                    </button>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setCurrentScreen('referrals')}
-                    className="w-full p-3.5 bg-white rounded-2xl border border-saathi-border text-left shadow-sm flex items-center justify-between hover:border-saathi-teal transition-saathi"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-xl shrink-0 ${openReferralsCount === 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-saathi-paleMint text-saathi-teal'}`}>
-                        <GitPullRequest className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <strong className="text-sm text-saathi-navy block leading-snug">
-                          {openReferralsCount === 0
-                            ? taskTexts.zeroReferralsPending
-                            : openReferralsCount === 1
-                            ? taskTexts.singleReferralPending
-                            : taskTexts.multipleReferralsPending(openReferralsCount)}
-                        </strong>
-                        <span className="text-xs text-saathi-textSecondary">
-                          {openReferralsCount === 0
-                            ? taskTexts.allReferralsClosed
-                            : taskTexts.followThroughOpen(openReferrals[0]?.facilityName || 'Nabha CHC')}
-                        </span>
-                      </div>
-                    </div>
-                    <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded shrink-0 ${
-                        openReferralsCount === 0
-                          ? 'text-emerald-700 bg-emerald-50'
-                          : 'text-saathi-teal bg-teal-50'
-                      }`}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentScreen('referrals')}
+                      className="flex-1 p-3.5 bg-white rounded-2xl border border-saathi-border text-left shadow-sm flex items-center justify-between hover:border-saathi-teal transition-saathi"
                     >
-                      {openReferralsCount === 0
-                        ? taskTexts.closedBadge
-                        : `${t.activeBadge} (${openReferralsCount})`}
-                    </span>
-                  </button>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-xl shrink-0 ${openReferralsCount === 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-saathi-paleMint text-saathi-teal'}`}>
+                          <GitPullRequest className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <strong className="text-sm text-saathi-navy block leading-snug">
+                            {openReferralsCount === 0
+                              ? taskTexts.zeroReferralsPending
+                              : openReferralsCount === 1
+                              ? taskTexts.singleReferralPending
+                              : taskTexts.multipleReferralsPending(openReferralsCount)}
+                          </strong>
+                          <span className="text-xs text-saathi-textSecondary">
+                            {openReferralsCount === 0
+                              ? taskTexts.allReferralsClosed
+                              : taskTexts.followThroughOpen(openReferrals[0]?.facilityName || 'Nabha CHC')}
+                          </span>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-xs font-bold px-2 py-0.5 rounded shrink-0 ${
+                          openReferralsCount === 0
+                            ? 'text-emerald-700 bg-emerald-50'
+                            : 'text-saathi-teal bg-teal-50'
+                        }`}
+                      >
+                        {openReferralsCount === 0
+                          ? taskTexts.closedBadge
+                          : `${t.activeBadge} (${openReferralsCount})`}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const spokenR = isEn
+                          ? `You have ${openReferralsCount} open hospital ${openReferralsCount === 1 ? 'referral' : 'referrals'} awaiting doctor report.`
+                          : `आपके पास ${openReferralsCount} अस्पताल रेफरल डॉक्टर की रिपोर्ट की प्रतीक्षा में हैं।`;
+                        const phoneticR = isEn
+                          ? spokenR
+                          : `Aapke paas ${openReferralsCount} hospital referral doctor ki report ki pratiksha mein hain.`;
+                        speakText(spokenR, phoneticR);
+                      }}
+                      className="p-3.5 bg-white rounded-2xl border border-saathi-border text-saathi-teal hover:border-saathi-teal hover:bg-saathi-paleMint/40 transition-saathi shrink-0 shadow-sm flex items-center justify-center"
+                      title={isEn ? "Listen to referrals count" : "रेफरल की स्थिति सुनें"}
+                      aria-label="Listen to referral status"
+                    >
+                      <Volume2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Primary Large Touch Action Buttons */}

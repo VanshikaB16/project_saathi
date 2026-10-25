@@ -99,6 +99,19 @@ class WebSpeechTtsService {
   private currentBcp47: string = 'hi-IN';
   private speechRate: number = 0.9;
 
+  constructor() {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.onvoiceschanged = () => {
+          try {
+            window.speechSynthesis.getVoices();
+          } catch {}
+        };
+        window.speechSynthesis.getVoices();
+      } catch {}
+    }
+  }
+
   public setMuted(muted: boolean): void {
     this.isMuted = muted;
     elevenLabsService.stop();
@@ -188,7 +201,7 @@ class WebSpeechTtsService {
         const elevenNativeScripts = ['en', 'hi', 'ta'];
         let elevenText = text;
 
-        if (!elevenNativeScripts.includes(code) || explicitPhonetic) {
+        if (!elevenNativeScripts.includes(code)) {
           elevenText = this.resolvePhoneticText(text, code, explicitPhonetic);
         }
 
@@ -208,59 +221,78 @@ class WebSpeechTtsService {
   public speakNativeBrowser(text: string, langCode?: string, explicitPhonetic?: string): void {
     if (this.isMuted || !text) return;
 
-    if (!('speechSynthesis' in window)) {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       console.warn('[TTS] Web Speech API is not supported in this browser environment.');
       return;
     }
 
     try {
-      window.speechSynthesis.cancel(); // Stop any pending utterance
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
 
       const code = langCode || this.currentLanguageCode || 'hi';
       const bcpTag = getBcp47Tag(code);
-      const voices = window.speechSynthesis.getVoices();
+      const voices = window.speechSynthesis.getVoices() || [];
 
-      // 1. Direct language match (e.g. 'ne-IN', 'ta-IN', 'pa-IN', 'te-IN')
+      // 1. Direct language match (e.g. 'hi-IN', 'ta-IN', 'pa-IN', 'te-IN')
       let nativeVoice = voices.find(v => 
         v.lang.toLowerCase() === bcpTag.toLowerCase() ||
         (code !== 'en' && v.lang.toLowerCase().startsWith(code.toLowerCase()))
       );
 
-      // 2. For Devanagari languages (e.g. Nepali, Maithili, Sindhi, Dogri, Sanskrit, Konkani, Bodo), Hindi voice can read native Devanagari
-      const isDevanagari = ['ne', 'mai', 'doi', 'brx', 'kok', 'sa', 'sd'].includes(code);
+      // 2. For Devanagari languages (e.g. Hindi, Nepali, Maithili, Sindhi, Dogri, Sanskrit, Konkani, Bodo)
+      const isDevanagari = ['hi', 'ne', 'mai', 'doi', 'brx', 'kok', 'sa', 'sd'].includes(code);
       if (!nativeVoice && isDevanagari) {
         nativeVoice = voices.find(v => v.lang.toLowerCase().startsWith('hi'));
       }
 
       let textToSpeak = text;
-      let voiceToUse: SpeechSynthesisVoice | undefined = nativeVoice;
       let targetLang = nativeVoice ? nativeVoice.lang : bcpTag;
 
-      if (!nativeVoice) {
-        // Fallback: Host lacks a native voice for this Indic script.
-        // Look up phonetic spoken text so words are not silently dropped.
-        textToSpeak = this.resolvePhoneticText(text, code, explicitPhonetic);
-
-        // Pick best available Indian English voice or English voice
-        voiceToUse = voices.find(v => v.lang.toLowerCase() === 'en-in') ||
-                     voices.find(v => v.lang.toLowerCase().includes('in') && v.lang.toLowerCase().startsWith('en')) ||
-                     voices.find(v => v.name.toLowerCase().includes('rishi') || v.name.toLowerCase().includes('aman')) ||
-                     voices.find(v => v.lang.toLowerCase().startsWith('en')) ||
-                     voices[0];
-
-        targetLang = voiceToUse?.lang || 'en-IN';
+      // If NO native voice exists on this host device for the requested language,
+      // fallback to romanized phonetic text so English/default TTS engines can articulate clearly without silence.
+      if (!nativeVoice && code !== 'en') {
+        const phonetic = this.resolvePhoneticText(text, code, explicitPhonetic);
+        if (phonetic && phonetic.trim()) {
+          textToSpeak = phonetic.trim();
+        }
+        const fallbackVoice = voices.find(v => v.lang.toLowerCase() === 'en-in') ||
+                             voices.find(v => v.lang.toLowerCase().includes('in') && v.lang.toLowerCase().startsWith('en')) ||
+                             voices.find(v => v.name.toLowerCase().includes('rishi') || v.name.toLowerCase().includes('aman') || v.name.toLowerCase().includes('veena')) ||
+                             voices.find(v => v.lang.toLowerCase().startsWith('en')) ||
+                             voices[0];
+        targetLang = fallbackVoice?.lang || 'en-IN';
+        nativeVoice = fallbackVoice;
       }
 
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
       utterance.lang = targetLang;
-      utterance.rate = this.speechRate;
+      utterance.rate = this.speechRate || 0.9;
       utterance.pitch = 1.0;
 
-      if (voiceToUse) {
-        utterance.voice = voiceToUse;
+      if (nativeVoice) {
+        utterance.voice = nativeVoice;
       }
 
-      window.speechSynthesis.speak(utterance);
+      utterance.onerror = (e) => {
+        console.warn('[TTS] Utterance error:', e);
+      };
+
+      // Slight timeout prevents WebKit/Safari from aborting speech immediately after cancel
+      setTimeout(() => {
+        try {
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.error('[TTS] Error playing utterance in speak:', e);
+        }
+      }, 40);
     } catch (err) {
       console.error('[TTS] Error playing speech utterance:', err);
     }
