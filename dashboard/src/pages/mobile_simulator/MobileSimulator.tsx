@@ -70,9 +70,41 @@ export type MobileScreenId =
   | 'followups'
   | 'settings';
 
-export const MobileSimulator: React.FC = () => {
+export interface MobileSimulatorProps {
+  initialRole?: 'ASHA' | 'DOCTOR';
+  standalone?: boolean;
+  onNavigatePortal?: (route: 'ADMIN' | 'MOBILE' | 'DOCTOR') => void;
+}
+
+const DEFAULT_ASHA_PROFILE: MobileUserProfile = {
+  role: 'ASHA',
+  name: 'सुनीता देवी (Sunita Devi)',
+  aadhaar: '4829 8812 3041',
+  ashaId: 'ASHA-PB-2041',
+  phone: '9876543210',
+};
+
+const DEFAULT_DOCTOR_PROFILE: MobileUserProfile = {
+  role: 'DOCTOR',
+  name: 'डॉ. राजीव वर्मा (Dr. Rajiv Verma)',
+  hospitalName: 'नाभा सीएचसी (Nabha CHC)',
+  nmrId: 'NMR-PB-49102',
+  phone: '9812345678',
+};
+
+export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
+  initialRole,
+  standalone = false,
+  onNavigatePortal,
+}) => {
   // Mobile User Role Profile (ASHA vs Doctor)
   const [currentUserProfile, setCurrentUserProfile] = useState<MobileUserProfile | null>(() => {
+    if (initialRole === 'DOCTOR') {
+      return DEFAULT_DOCTOR_PROFILE;
+    }
+    if (initialRole === 'ASHA') {
+      return DEFAULT_ASHA_PROFILE;
+    }
     try {
       const saved = localStorage.getItem('saathi_mobile_user_profile');
       return saved ? JSON.parse(saved) : null;
@@ -80,6 +112,15 @@ export const MobileSimulator: React.FC = () => {
       return null;
     }
   });
+
+  // Automatically update role when initialRole changes
+  React.useEffect(() => {
+    if (initialRole === 'DOCTOR') {
+      setCurrentUserProfile(DEFAULT_DOCTOR_PROFILE);
+    } else if (initialRole === 'ASHA') {
+      setCurrentUserProfile(DEFAULT_ASHA_PROFILE);
+    }
+  }, [initialRole]);
 
   const handleLogin = (profile: MobileUserProfile) => {
     setCurrentUserProfile(profile);

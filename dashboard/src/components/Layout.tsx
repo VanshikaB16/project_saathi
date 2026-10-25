@@ -3,6 +3,7 @@ import {
   HeartPulse,
   LayoutDashboard,
   Smartphone,
+  Stethoscope,
   Map,
   GitPullRequest,
   Tent,
@@ -22,20 +23,24 @@ import { UrgentAlertModal } from './UrgentAlertModal';
 import { speechTts } from '../services/speechTts';
 import { offlineStore } from '../services/offlineStore';
 
-export type AppMode = 'ADMIN' | 'MOBILE';
+export type AppMode = 'ADMIN' | 'MOBILE' | 'DOCTOR';
 export type AdminTab = 'overview' | 'villages' | 'referrals' | 'camps' | 'models' | 'audit' | 'settings';
 
 interface LayoutProps {
-  currentMode: AppMode;
-  onModeChange: (mode: AppMode) => void;
+  currentMode?: AppMode;
+  onModeChange?: (mode: AppMode) => void;
+  currentRoute?: 'ADMIN' | 'MOBILE' | 'DOCTOR';
+  onNavigateRoute?: (route: 'ADMIN' | 'MOBILE' | 'DOCTOR') => void;
   currentAdminTab: AdminTab;
   onAdminTabChange: (tab: AdminTab) => void;
   children: React.ReactNode;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
-  currentMode,
+  currentMode = 'ADMIN',
   onModeChange,
+  currentRoute = 'ADMIN',
+  onNavigateRoute,
   currentAdminTab,
   onAdminTabChange,
   children,
@@ -44,6 +49,16 @@ export const Layout: React.FC<LayoutProps> = ({
   const [isMuted, setIsMuted] = useState(speechTts.getIsMuted());
   const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleRouteClick = (route: 'ADMIN' | 'MOBILE' | 'DOCTOR') => {
+    if (onNavigateRoute) {
+      onNavigateRoute(route);
+    } else if (onModeChange) {
+      onModeChange(route);
+    }
+  };
+
+  const activeMode = currentRoute || currentMode;
 
   const toggleNetwork = () => {
     const newState = offlineStore.toggleNetwork();
@@ -97,34 +112,51 @@ export const Layout: React.FC<LayoutProps> = ({
               </div>
             </div>
 
-            {/* Mode Switcher Pills (Admin Portal vs ASHA Mobile Simulator) */}
+            {/* Mode Switcher Pills (Admin Portal vs ASHA Mobile vs Doctor Portal) */}
             <div className="bg-saathi-deepNavy p-1 rounded-2xl border border-slate-700 flex items-center shadow-inner">
               <button
                 type="button"
-                onClick={() => onModeChange('ADMIN')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-saathi ${
-                  currentMode === 'ADMIN'
+                onClick={() => handleRouteClick('ADMIN')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-saathi ${
+                  activeMode === 'ADMIN'
                     ? 'bg-saathi-teal text-white shadow-md'
                     : 'text-slate-300 hover:text-white'
                 }`}
+                title="District Admin Dashboard (/)"
               >
                 <LayoutDashboard className="w-4 h-4" />
-                <span className="hidden md:inline">जिला प्रशासन</span>
-                <span>District Admin</span>
+                <span className="hidden lg:inline">जिला प्रशासन</span>
+                <span>Admin</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => onModeChange('MOBILE')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-saathi ${
-                  currentMode === 'MOBILE'
+                onClick={() => handleRouteClick('MOBILE')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-saathi ${
+                  activeMode === 'MOBILE'
                     ? 'bg-saathi-teal text-white shadow-md'
                     : 'text-slate-300 hover:text-white'
                 }`}
+                title="ASHA Mobile Simulator (/mobile)"
               >
                 <Smartphone className="w-4 h-4" />
-                <span className="hidden md:inline">आशा मोबाइल ऐप</span>
-                <span>ASHA Mobile</span>
+                <span className="hidden lg:inline">आशा मोबाइल</span>
+                <span>ASHA</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleRouteClick('DOCTOR')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-saathi ${
+                  activeMode === 'DOCTOR'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+                title="Doctor Review & OPD Portal (/doctor)"
+              >
+                <Stethoscope className="w-4 h-4" />
+                <span className="hidden lg:inline">चिकित्सक</span>
+                <span>Doctor</span>
               </button>
             </div>
 
@@ -171,7 +203,7 @@ export const Layout: React.FC<LayoutProps> = ({
               </button>
 
               {/* Mobile Navigation Menu Toggle */}
-              {currentMode === 'ADMIN' && (
+              {activeMode === 'ADMIN' && (
                 <button
                   type="button"
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -185,7 +217,7 @@ export const Layout: React.FC<LayoutProps> = ({
         </div>
 
         {/* Sub-header Secondary Navigation for District Admin */}
-        {currentMode === 'ADMIN' && (
+        {activeMode === 'ADMIN' && (
           <div className="border-t border-slate-800 bg-saathi-deepNavy/70 backdrop-blur">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <nav className="hidden md:flex space-x-1 py-2 overflow-x-auto text-xs">
