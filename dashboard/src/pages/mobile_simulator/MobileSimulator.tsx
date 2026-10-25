@@ -74,6 +74,7 @@ export interface MobileSimulatorProps {
   initialRole?: 'ASHA' | 'DOCTOR';
   standalone?: boolean;
   onNavigatePortal?: (route: 'ADMIN' | 'MOBILE' | 'DOCTOR') => void;
+  startAtLogin?: boolean;
 }
 
 const DEFAULT_ASHA_PROFILE: MobileUserProfile = {
@@ -96,21 +97,20 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
   initialRole,
   standalone = false,
   onNavigatePortal,
+  startAtLogin = false,
 }) => {
   // Mobile User Role Profile (ASHA vs Doctor)
   const [currentUserProfile, setCurrentUserProfile] = useState<MobileUserProfile | null>(() => {
+    if (startAtLogin) {
+      return null;
+    }
     if (initialRole === 'DOCTOR') {
       return DEFAULT_DOCTOR_PROFILE;
     }
     if (initialRole === 'ASHA') {
       return DEFAULT_ASHA_PROFILE;
     }
-    try {
-      const saved = localStorage.getItem('saathi_mobile_user_profile');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
+    return null;
   });
 
   // Automatically update role when initialRole changes

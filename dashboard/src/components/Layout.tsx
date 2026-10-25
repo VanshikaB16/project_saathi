@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import {
   HeartPulse,
   LayoutDashboard,
-  Smartphone,
-  Stethoscope,
+  Building2,
+  ShieldCheck,
   Map,
   GitPullRequest,
   Tent,
@@ -49,16 +49,6 @@ export const Layout: React.FC<LayoutProps> = ({
   const [isMuted, setIsMuted] = useState(speechTts.getIsMuted());
   const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const handleRouteClick = (route: 'ADMIN' | 'MOBILE' | 'DOCTOR') => {
-    if (onNavigateRoute) {
-      onNavigateRoute(route);
-    } else if (onModeChange) {
-      onModeChange(route);
-    }
-  };
-
-  const activeMode = currentRoute || currentMode;
 
   const toggleNetwork = () => {
     const newState = offlineStore.toggleNetwork();
@@ -112,52 +102,22 @@ export const Layout: React.FC<LayoutProps> = ({
               </div>
             </div>
 
-            {/* Mode Switcher Pills (Admin Portal vs ASHA Mobile vs Doctor Portal) */}
-            <div className="bg-saathi-deepNavy p-1 rounded-2xl border border-slate-700 flex items-center shadow-inner">
-              <button
-                type="button"
-                onClick={() => handleRouteClick('ADMIN')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-saathi ${
-                  activeMode === 'ADMIN'
-                    ? 'bg-saathi-teal text-white shadow-md'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-                title="District Admin Dashboard (/)"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                <span className="hidden lg:inline">जिला प्रशासन</span>
-                <span>Admin</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleRouteClick('MOBILE')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-saathi ${
-                  activeMode === 'MOBILE'
-                    ? 'bg-saathi-teal text-white shadow-md'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-                title="ASHA Mobile Simulator (/mobile)"
-              >
-                <Smartphone className="w-4 h-4" />
-                <span className="hidden lg:inline">आशा मोबाइल</span>
-                <span>ASHA</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleRouteClick('DOCTOR')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-saathi ${
-                  activeMode === 'DOCTOR'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-                title="Doctor Review & OPD Portal (/doctor)"
-              >
-                <Stethoscope className="w-4 h-4" />
-                <span className="hidden lg:inline">चिकित्सक</span>
-                <span>Doctor</span>
-              </button>
+            {/* District Medical Officer Identity Badge (Dedicated DMO Portal) */}
+            <div className="hidden md:flex items-center gap-2.5 bg-saathi-deepNavy/80 px-3.5 py-1.5 rounded-2xl border border-slate-700 shadow-inner">
+              <div className="w-7 h-7 rounded-lg bg-saathi-teal/20 border border-saathi-teal/40 flex items-center justify-center text-saathi-softMint">
+                <Building2 className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-white leading-tight">
+                  <span>जिला चिकित्सा अधिकारी (DMO Portal)</span>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-mono px-1.5 py-0.2 rounded">
+                    पटियाला
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-300 leading-tight">
+                  District Health Administration • Monitoring Command Center
+                </div>
+              </div>
             </div>
 
             {/* Utility Controls (Network State, TTS Mute, Emergency Action) */}
@@ -203,21 +163,19 @@ export const Layout: React.FC<LayoutProps> = ({
               </button>
 
               {/* Mobile Navigation Menu Toggle */}
-              {activeMode === 'ADMIN' && (
-                <button
-                  type="button"
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="p-2 rounded-xl text-slate-300 hover:text-white md:hidden"
-                >
-                  {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 rounded-xl text-slate-300 hover:text-white md:hidden"
+              >
+                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Sub-header Secondary Navigation for District Admin */}
-        {activeMode === 'ADMIN' && (
+        {/* Sub-header Secondary Navigation for District Medical Officer */}
+        <div className="border-t border-slate-800 bg-saathi-deepNavy/70 backdrop-blur">
           <div className="border-t border-slate-800 bg-saathi-deepNavy/70 backdrop-blur">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <nav className="hidden md:flex space-x-1 py-2 overflow-x-auto text-xs">
@@ -269,7 +227,7 @@ export const Layout: React.FC<LayoutProps> = ({
               )}
             </div>
           </div>
-        )}
+        </div>
       </header>
 
       {/* Main Content Area */}
