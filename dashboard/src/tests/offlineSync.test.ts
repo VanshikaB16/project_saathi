@@ -11,8 +11,25 @@ describe('Offline Store & Synchronization Behavior', () => {
   });
 
   it('maintains open follow-through loop until clinician outcome is recorded', () => {
-    const referrals = offlineStore.getReferrals();
-    const openReferral = referrals.find(r => r.status === 'REFERRED');
+    let referrals = offlineStore.getReferrals();
+    let openReferral = referrals.find(r => r.status === 'REFERRED');
+    if (!openReferral) {
+      offlineStore.saveReferral({
+        id: 'ref-test-01',
+        safeReferenceCode: 'SAA-REF-TEST',
+        patientSafeId: 'SAA-PAT-TEST',
+        villageName: 'Rampur',
+        pathway: 'Skin Sign Screening',
+        urgencyTier: 'PROMPT_ASSESSMENT',
+        status: 'REFERRED',
+        facilityName: 'Nabha CHC',
+        reasonSummary: 'Test referral',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      referrals = offlineStore.getReferrals();
+      openReferral = referrals.find(r => r.status === 'REFERRED');
+    }
     expect(openReferral).toBeDefined();
     expect(openReferral?.outcomeSummary).toBeUndefined();
 

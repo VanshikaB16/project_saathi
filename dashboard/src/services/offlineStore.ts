@@ -88,202 +88,19 @@ export interface StoredCamp {
   createdAt: string;
 }
 
-const INITIAL_PATIENTS: StoredPatient[] = [
-  {
-    id: 'pat-01',
-    safeIdentifier: 'SAA-RAM-2026-4421',
-    name: 'सुनीता देवी (Sunita Devi)',
-    villageName: 'रामपूर (Rampur)',
-    ageYears: 54,
-    gender: 'FEMALE',
-    emergencyContact: '+919876543210',
-    createdAt: '2026-10-14T09:30:00Z',
-  },
-  {
-    id: 'pat-02',
-    safeIdentifier: 'SAA-KAL-2026-8812',
-    name: 'बलबीर सिंह (Balbir Singh)',
-    villageName: 'कल्याणपुर (Kalyanpur)',
-    ageYears: 62,
-    gender: 'MALE',
-    emergencyContact: '+919812345678',
-    createdAt: '2026-10-13T14:15:00Z',
-  },
-  {
-    id: 'pat-03',
-    safeIdentifier: 'SAA-SUN-2026-1049',
-    name: 'मंजीत कौर (Manjeet Kaur)',
-    villageName: 'सुंदरनगर (Sundernagar)',
-    ageYears: 48,
-    gender: 'FEMALE',
-    emergencyContact: '+919855512345',
-    createdAt: '2026-10-12T11:00:00Z',
-  },
-];
+const INITIAL_PATIENTS: StoredPatient[] = [];
 
-const INITIAL_REFERRALS: StoredReferral[] = [
-  {
-    id: 'ref-01',
-    safeReferenceCode: 'SAA-REF-10492',
-    patientSafeId: 'SAA-RAM-2026-4421',
-    villageName: 'रामपूर',
-    pathway: 'त्वचा लक्षण स्क्रीनिंग',
-    urgencyTier: 'PROMPT_ASSESSMENT',
-    status: 'APPOINTMENT_SCHEDULED',
-    facilityName: 'Nabha Community Health Centre (CHC)',
-    reasonSummary: 'असामान्य त्वचा बदलाव एवं नीले निशान दिखे।',
-    followupRequested: true,
-    followupDays: 5,
-    doctorInitialAdvice: 'त्वचा घाव की स्थिति और लाली की जाँच 5 दिन बाद आशा कार्यकर्ता द्वारा की जाए। दवा अनुपालन सुनिश्चित करें।',
-    doctorName: 'डॉ. राजीव वर्मा (Dr. Rajiv Verma)',
-    linkedFollowupId: 'foll-01',
-    createdAt: '2026-10-14T10:00:00Z',
-    updatedAt: '2026-10-14T10:00:00Z',
-  },
-  {
-    id: 'ref-02',
-    safeReferenceCode: 'SAA-REF-20188',
-    patientSafeId: 'SAA-KAL-2026-8812',
-    villageName: 'कल्याणपुर',
-    pathway: 'आंख एवं रेटिना स्क्रीनिंग',
-    urgencyTier: 'PROMPT_ASSESSMENT',
-    status: 'REFERRED',
-    facilityName: 'Mata Kaushalya District Hospital',
-    reasonSummary: 'मधुमेह के साथ धुंधली दृष्टि। नेत्र विशेषज्ञ परामर्श आवश्यक।',
-    createdAt: '2026-10-13T15:00:00Z',
-    updatedAt: '2026-10-13T15:00:00Z',
-  },
-  {
-    id: 'ref-03',
-    safeReferenceCode: 'SAA-REF-30911',
-    patientSafeId: 'SAA-SUN-2026-1049',
-    villageName: 'सुंदरनगर',
-    pathway: 'सीबीसी रक्त फनल',
-    urgencyTier: 'PROMPT_ASSESSMENT',
-    status: 'COMPLETED',
-    facilityName: 'Nabha Community Health Centre (CHC)',
-    reasonSummary: 'प्लेटलेट्स 45,000 /uL।',
-    outcomeSummary: 'वरिष्ठ चिकित्सा अधिकारी द्वारा जांच संपन्न। प्लेटलेट्स सुधरकर 90,000 हुई। छुट्टी दी गई।',
-    createdAt: '2026-10-12T12:00:00Z',
-    updatedAt: '2026-10-14T16:00:00Z',
-  },
-];
+const INITIAL_REFERRALS: StoredReferral[] = [];
 
-const INITIAL_FOLLOWUPS: StoredFollowup[] = [
-  {
-    id: 'foll-01',
-    patientSafeId: 'SAA-RAM-2026-4421',
-    patientName: 'सुनीता देवी (Sunita Devi)',
-    patientAge: 54,
-    villageName: 'रामपूर (Rampur)',
-    taskTitle: 'त्वचा पुनः जाँच (Skin Recheck)',
-    dueLabel: 'Due Tomorrow',
-    status: 'PENDING',
-    referralCode: 'SAA-REF-10492',
-    doctorInitialAdvice: 'डॉ. राजीव वर्मा: 5 दिन बाद घाव के भरने और लाली की स्थिति पुनः जाँचें। दवा का असर देखें।',
-    doctorName: 'डॉ. राजीव वर्मा (Dr. Rajiv Verma)',
-    createdAt: '2026-10-14T10:00:00Z',
-  },
-  {
-    id: 'foll-02',
-    patientSafeId: 'SAA-KAL-2026-8812',
-    patientName: 'राजिंदर सिंह (Rajinder Singh)',
-    patientAge: 62,
-    villageName: 'कल्याणपुर (Kalyanpur)',
-    taskTitle: 'नेत्र दृष्टि जांच (Vision Recheck)',
-    dueLabel: 'Due in 2 days',
-    status: 'PENDING',
-    referralCode: 'SAA-REF-20188',
-    doctorInitialAdvice: 'डॉ. अमिता कौल: 7 दिन बाद विज़न सुधार व दवा अनुपालन की गृह भेंट करें।',
-    doctorName: 'डॉ. अमिता कौल (Dr. Amita Kaul)',
-    createdAt: '2026-10-13T15:00:00Z',
-  },
-];
+const INITIAL_FOLLOWUPS: StoredFollowup[] = [];
 
-const INITIAL_SCREENINGS: StoredScreening[] = [
-  {
-    id: 'scr-01',
-    patientSafeId: 'SAA-RAM-2026-4421',
-    pathway: 'Skin Sign Screening',
-    resultFlag: 'AMBER',
-    timestamp: '2026-10-14T09:45:00Z',
-  },
-  {
-    id: 'scr-02',
-    patientSafeId: 'SAA-KAL-2026-8812',
-    pathway: 'Eye / Retina Screening',
-    resultFlag: 'RED',
-    timestamp: '2026-10-13T14:30:00Z',
-  },
-  {
-    id: 'scr-03',
-    patientSafeId: 'SAA-SUN-2026-1049',
-    pathway: 'CBC Blood Funnel',
-    resultFlag: 'RED',
-    timestamp: '2026-10-12T11:20:00Z',
-  },
-];
+const INITIAL_SCREENINGS: StoredScreening[] = [];
 
-const INITIAL_CAMPS: StoredCamp[] = [
-  {
-    id: 'camp-01',
-    name: 'Rampur Gram Panchayat Health Mela',
-    date: '2026-10-24',
-    village: 'Rampur',
-    targetPopulation: 'Elderly & NCD High-Risk (बुजुर्ग एवं गैर-संचारी रोग)',
-    allocatedStaff: '4 ASHA Workers, 1 MO, 1 Lab Tech',
-    equipmentReady: 'Portable CBC, 1 Fundus Lens',
-    status: 'CONFIRMED',
-    rosterDetails: {
-      medicalOfficer: 'डॉ. राजीव वर्मा (Dr. Rajiv Verma, MO PHC Rampur)',
-      ashaWorkers: ['सुनीता कौर (ASHA-01)', 'कमलेश देवी (ASHA-02)', 'हरप्रीत कौर (ASHA-03)', 'पूजा रानी (ASHA-04)'],
-      labTechnician: 'गुरप्रीत सिंह (Lab Tech, Rampur PHC)',
-      vanDetails: 'Patiala District Health Mobile Van #PB-11-2041',
-    },
-    notes: 'विशेष फोकस: मधुमेह, उच्च रक्तचाप एवं मोतियाबिंद/रेटिनोपैथी स्क्रीनिंग।',
-    createdAt: '2026-10-18T09:00:00Z',
-  },
-  {
-    id: 'camp-02',
-    name: 'Kalyanpur Mobile Screening Camp',
-    date: '2026-11-02',
-    village: 'Kalyanpur',
-    targetPopulation: 'General Community & School Children (सामान्य ग्रामीण समुदाय)',
-    allocatedStaff: '3 ASHA Workers, 1 Mobile Van, 1 MO',
-    equipmentReady: 'Digital Radiograph Van Scheduled',
-    status: 'PLANNING',
-    rosterDetails: {
-      medicalOfficer: 'डॉ. अमिता कौल (Dr. Amita Kaul, MO Nabha CHC)',
-      ashaWorkers: ['मंजीत कौर (ASHA-05)', 'बलजीत कौर (ASHA-06)', 'रेखा शर्मा (ASHA-07)'],
-      labTechnician: 'राजेश कुमार (Lab Tech, Nabha CHC)',
-      vanDetails: 'NTEP Digital X-Ray Van #PB-11-9921',
-    },
-    notes: 'क्षयरोग (TB) संभावित लक्षण एवं सीबीसी रक्त एनीमिया जांच शिविर।',
-    createdAt: '2026-10-20T11:30:00Z',
-  },
-  {
-    id: 'camp-03',
-    name: 'Sundernagar NCD & Eye Outreach Camp',
-    date: '2026-11-08',
-    village: 'Sundernagar',
-    targetPopulation: 'High Referral Demand & Follow-up Gap Cohort (फॉलो-अप अंतराल समाधान)',
-    allocatedStaff: '3 ASHA Workers, 1 Optometrist, 1 MO',
-    equipmentReady: 'Non-Mydriatic Fundus Camera, BP/Glucose Kit',
-    status: 'PLANNING',
-    rosterDetails: {
-      medicalOfficer: 'डॉ. सुखविंदर सिंह (Dr. Sukhwinder Singh, Eye Specialist)',
-      ashaWorkers: ['सिमरनजीत कौर (ASHA-08)', 'जसप्रीत कौर (ASHA-09)', 'अमनदीप कौर (ASHA-10)'],
-      labTechnician: 'विकास मेहरा (Senior Lab Tech)',
-      vanDetails: 'District Mobile Outreach Van #PB-11-4012',
-    },
-    notes: 'सुंदरनगर में पहचाने गए सेवा अंतराल और लंबित फॉलो-अप को पूरा करने हेतु विशेष शिविर।',
-    createdAt: '2026-10-22T14:00:00Z',
-  },
-];
+const INITIAL_CAMPS: StoredCamp[] = [];
 
 class OfflineStore {
   private isOnline: boolean = true;
-  private pendingSyncCount: number = 3;
+  private pendingSyncCount: number = 0;
   private listeners: Array<() => void> = [];
 
   constructor() {
@@ -291,6 +108,23 @@ class OfflineStore {
       window.addEventListener('storage', () => {
         this.notify();
       });
+
+      // Clear any previous synthetic demo seed data so everything starts at 0
+      try {
+        const CURRENT_DATA_VERSION = 'v4_clean_zero_start';
+        const storedVersion = localStorage.getItem('saathi_data_version');
+        if (storedVersion !== CURRENT_DATA_VERSION) {
+          localStorage.removeItem('saathi_patients');
+          localStorage.removeItem('saathi_referrals');
+          localStorage.removeItem('saathi_followups');
+          localStorage.removeItem('saathi_screenings');
+          localStorage.removeItem('saathi_camps');
+          localStorage.removeItem('saathi_quality_failures');
+          localStorage.setItem('saathi_data_version', CURRENT_DATA_VERSION);
+        }
+      } catch (e) {
+        console.warn('Could not reset local storage demo data', e);
+      }
     }
   }
 
