@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/browser-use/(.*)",
+      "destination": "https://api.browser-use.com/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

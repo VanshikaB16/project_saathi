@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for Role-Based Access Control (RBAC)
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return request.auth.token.role;
+    }
+
+    function isAshaWorker() {
+      return isAuthenticated() && getUserRole() == 'ASHA_WORKER';
+    }
+
+    function isClinician() {
+      return isAuthenticated() && getUserRole() == 'CLINICIAN';
+    }
+
+    function isDistrictAdmin() {
+      return isAuthenticated() && getUserRole() == 'DISTRICT_ADMIN';
+    }
+
+    function isSystemAdmin() {
+      return isAuthenticated() && getUserRole() == 'SYSTEM_ADMIN';
+    }
+
+    // 1. Patient Profiles (Protected PII)
+    // District Admin MUST NOT read individual patient records directly (privacy by design).
+    match /patient_profiles/{patientId} {
+      allow read: if isAshaWorker() || isClinician() || isSystemAdmin();
+      allow create: if isAshaWorker();
+      allow update: if isAshaWorker() || isClinician();
+      allow delete: if isSystemAdmin(); // Controlled deletion only
+    }
+
+    // 2. Consent Records (Strict provenance)
+    match /consent_records/{consentId} {
+      allow read: if isAshaWorker() || isClinician() || isSystemAdmin();
+      allow create: if isAshaWorker();
+      allow update: if isAshaWorker() && request.resource.data.is_withdrawn == true;
+    }
+
+    // 3. Screening Sessions & Results (Non-diagnostic flags)
+    match /screening_sessions/{sessionId} {
+      allow read: if isAshaWorker() || isClinician() || isSystemAdmin();
+      allow create: if isAshaWorker();
+    }
+
+    match /screening_results/{resultId} {
+      allow read: if isAshaWorker() || isClinician() || isSystemAdmin();
+      allow create: if isAshaWorker();
+    }
+
+    // 4. Referrals (Follow-through loop)
+    match /referrals/{referralId} {
+      allow read: if isAshaWorker() || isClinician() || isDistrictAdmin() || isSystemAdmin();
+      allow create: if isAshaWorker();
+      // Only Clinicians can record clinical outcomes and close referrals
+      allow update: if isClinician() || (isAshaWorker() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updated_at']));
+    }
+
+    // 5. Model Registry (Governed by System Admin & Clinicians)
+    match /model_registry/{modelId} {
+      allow read: if isAuthenticated();
+      allow write: if isSystemAdmin() || isClinician();
+    }
+
+    // 6. District Aggregates (Anonymized, safe for District Admin)
+    match /district_aggregates/{aggregateId} {
+      allow read: if isDistrictAdmin() || isClinician() || isSystemAdmin();
+      allow write: if isSystemAdmin(); // Computed via secure background Cloud Functions
+    }
+
+    // 7. Audit Logs (Append-only tamper-evident logs)
+    match /audit_logs/{logId} {
+      allow read: if isDistrictAdmin() || isSystemAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Immutable!
+    }
+  }
+}
