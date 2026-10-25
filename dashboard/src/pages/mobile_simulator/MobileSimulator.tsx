@@ -566,8 +566,8 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
         ))}
       </datalist>
 
-      {/* Screen Viewport: Full screen on mobile phones, responsive max-w-2xl on laptop/desktop */}
-      <div className="w-full max-w-2xl mx-auto flex-1 flex flex-col justify-between bg-saathi-offWhite relative">
+      {/* Screen Viewport: Full screen on mobile phones, responsive max-w-5xl on laptop/desktop */}
+      <div className="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-between bg-saathi-offWhite relative px-2 sm:px-6">
         {/* Persistent In-App Demo Badge */}
         <div className="bg-saathi-amber text-white text-[11px] font-bold py-1 px-3 text-center uppercase tracking-wider z-20 shadow-xs">
           {t.demoBadge}
