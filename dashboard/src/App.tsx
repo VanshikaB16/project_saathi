@@ -33,14 +33,14 @@ export const App: React.FC = () => {
   );
 
   // 1. DEDICATED MOBILE APP VIEW
-  // - Pure mobile phone interface (no backend or DMO navigation on the page)
+  // - Pure native web app experience covering phone and desktop edge-to-edge
   // - Unified Login Screen for both ASHA Worker and Doctor
   if (isMobileApp) {
     const isDoctorDirect = pathname.startsWith('/doctor');
     const isAshaDirect = pathname.startsWith('/asha');
 
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-2 sm:p-4 select-none font-sans">
+      <div className="min-h-screen w-full bg-saathi-offWhite flex flex-col font-sans">
         <MobileSimulator
           standalone
           initialRole={isDoctorDirect ? 'DOCTOR' : isAshaDirect ? 'ASHA' : undefined}

@@ -549,7 +549,7 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
   );
 
   return (
-    <div className="flex flex-col items-center justify-center py-2">
+    <div className="w-full min-h-screen bg-saathi-offWhite flex flex-col justify-between">
       {/* Dynamic Village Datalist for Autocomplete & Custom Suggestions */}
       <datalist id="village-suggestions">
         <option value="रामपूर (Rampur)" />
@@ -566,31 +566,12 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
         ))}
       </datalist>
 
-      {/* Simulator Device Frame */}
-      <div className="relative w-full max-w-[420px] bg-slate-900 rounded-[44px] p-3 shadow-2xl border-4 border-slate-800 ring-1 ring-slate-700/50">
-        {/* Phone Speaker Notch */}
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-950 rounded-full z-30 flex items-center justify-center">
-          <div className="w-10 h-1 bg-slate-700 rounded-full"></div>
-          <div className="w-2 h-2 rounded-full bg-slate-800 ml-3"></div>
+      {/* Screen Viewport: Full screen on mobile phones, responsive max-w-2xl on laptop/desktop */}
+      <div className="w-full max-w-2xl mx-auto flex-1 flex flex-col justify-between bg-saathi-offWhite relative">
+        {/* Persistent In-App Demo Badge */}
+        <div className="bg-saathi-amber text-white text-[11px] font-bold py-1 px-3 text-center uppercase tracking-wider z-20 shadow-xs">
+          {t.demoBadge}
         </div>
-
-        {/* Screen Viewport */}
-        <div className="bg-saathi-offWhite rounded-[36px] overflow-hidden min-h-[740px] flex flex-col justify-between border border-slate-700/40 relative">
-          {/* Top Status Bar (Battery, Wifi, Time) */}
-          <div className="bg-saathi-primaryNavy text-white pt-5 pb-2 px-6 flex items-center justify-between text-xs select-none z-20">
-            <span className="font-bold">09:41</span>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-1.5 py-0.5 rounded">
-                SQLite Edge
-              </span>
-              <span>100%</span>
-            </div>
-          </div>
-
-          {/* Persistent In-App Demo Badge */}
-          <div className="bg-saathi-amber text-white text-[11px] font-bold py-1 px-3 text-center uppercase tracking-wider z-20 shadow-sm">
-            {t.demoBadge}
-          </div>
 
           {/* Screen Header Bar with Back Button & Language Picker */}
           {currentUserProfile && currentUserProfile.role === 'ASHA' && currentScreen !== 'welcome' && (
@@ -3586,6 +3567,5 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
           )}
         </div>
       </div>
-    </div>
   );
 };
