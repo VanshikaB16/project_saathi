@@ -92,6 +92,15 @@ class ElevenLabsService {
     return Boolean(this.apiKey && this.apiKey.length > 15);
   }
 
+  public isConfigured(): boolean {
+    return this.hasApiKey();
+  }
+
+  public getMaskedKey(): string {
+    if (!this.apiKey) return '';
+    return '••••••••••••••••••••••••••••••••';
+  }
+
   /**
    * Generates and plays audio from text using ElevenLabs Multilingual V2.
    * Returns true if audio played successfully, or false to trigger native fallback.

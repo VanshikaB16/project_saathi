@@ -78,7 +78,16 @@ export class BrowserUseService {
   }
 
   public hasApiKey(): boolean {
-    return Boolean(this.apiKey && this.apiKey.startsWith('bu_'));
+    return Boolean(this.apiKey && (this.apiKey.startsWith('bu_') || this.apiKey.length > 15));
+  }
+
+  public isConfigured(): boolean {
+    return this.hasApiKey();
+  }
+
+  public getMaskedKey(): string {
+    if (!this.apiKey) return '';
+    return '••••••••••••••••••••••••••••••••';
   }
 
   private getHeaders(): Record<string, string> {

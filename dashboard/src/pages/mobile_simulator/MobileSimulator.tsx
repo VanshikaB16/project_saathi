@@ -208,10 +208,10 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
   const [smearReviewed, setSmearReviewed] = useState(false);
 
   // ElevenLabs Mobile Assistant State
-  const [mobileElevenKey, setMobileElevenKey] = useState(() => elevenLabsService.getApiKey());
+  const [hasMobileElevenKey, setHasMobileElevenKey] = useState(() => elevenLabsService.hasApiKey());
+  const [newMobileElevenKey, setNewMobileElevenKey] = useState('');
   const [mobileElevenVoice, setMobileElevenVoice] = useState(() => elevenLabsService.getVoiceId());
   const [isMobileTestingVoice, setIsMobileTestingVoice] = useState(false);
-  const [showMobileKey, setShowMobileKey] = useState(false);
 
   // Dynamic Live Store States (synced with actual offline storage)
   const [referrals, setReferrals] = useState<StoredReferral[]>(() => offlineStore.getReferrals());
@@ -3115,38 +3115,52 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
 
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        mobileElevenKey && mobileElevenKey.length > 15
+                        hasMobileElevenKey
                           ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                           : 'bg-gray-100 text-gray-600'
                       }`}
                     >
-                      {mobileElevenKey && mobileElevenKey.length > 15 ? 'Active' : 'Offline Fallback'}
+                      {hasMobileElevenKey ? 'Active' : 'Offline Fallback'}
                     </span>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-[11px] font-bold text-saathi-navy">
-                        ElevenLabs API Key:
+                      <label className="text-[11px] font-bold text-saathi-navy flex items-center gap-1">
+                        <Shield className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>ElevenLabs AI Voice:</span>
                       </label>
-                      <button
-                        type="button"
-                        onClick={() => setShowMobileKey(!showMobileKey)}
-                        className="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold"
-                      >
-                        {showMobileKey ? 'Hide' : 'Show'}
-                      </button>
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        {hasMobileElevenKey ? 'सुरक्षित (Active ✓)' : 'Web Speech'}
+                      </span>
                     </div>
-                    <input
-                      type={showMobileKey ? 'text' : 'password'}
-                      value={mobileElevenKey}
-                      onChange={(e) => {
-                        setMobileElevenKey(e.target.value);
-                        elevenLabsService.setApiKey(e.target.value);
-                      }}
-                      placeholder="sk_..."
-                      className="w-full text-xs p-2 bg-slate-50 font-mono border border-saathi-border rounded-xl focus:border-indigo-600 outline-none"
-                    />
+
+                    <div className="p-2.5 bg-slate-100/90 rounded-xl border border-slate-200 flex items-center justify-between">
+                      <span className="font-mono text-xs text-slate-600 tracking-widest select-none">
+                        {hasMobileElevenKey ? '••••••••••••••••' : 'ऑन-डिवाइस वेब स्पीच'}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-semibold">
+                        {hasMobileElevenKey ? 'Secured Cloud' : 'Fallback'}
+                      </span>
+                    </div>
+
+                    <div className="mt-1.5">
+                      <input
+                        type="password"
+                        value={newMobileElevenKey}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setNewMobileElevenKey(val);
+                          if (val.trim()) {
+                            elevenLabsService.setApiKey(val.trim());
+                            setHasMobileElevenKey(true);
+                          }
+                        }}
+                        placeholder={hasMobileElevenKey ? 'कुंजी बदलने के लिए दर्ज करें (Optional override)' : 'sk_...'}
+                        className="w-full text-xs p-2 bg-white font-mono border border-saathi-border rounded-xl focus:border-indigo-600 outline-none"
+                        autoComplete="off"
+                      />
+                    </div>
                   </div>
 
                   {/* Voice Select */}
@@ -3176,7 +3190,10 @@ export const MobileSimulator: React.FC<MobileSimulatorProps> = ({
                     disabled={isMobileTestingVoice}
                     onClick={async () => {
                       setIsMobileTestingVoice(true);
-                      elevenLabsService.setApiKey(mobileElevenKey);
+                      if (newMobileElevenKey.trim()) {
+                        elevenLabsService.setApiKey(newMobileElevenKey.trim());
+                        setHasMobileElevenKey(true);
+                      }
                       elevenLabsService.setVoiceId(mobileElevenVoice);
                       const phrase = isEn
                         ? 'Namaste ASHA didi. Welcome to Project Saathi.'

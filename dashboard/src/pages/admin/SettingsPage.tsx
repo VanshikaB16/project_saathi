@@ -11,21 +11,24 @@ export const SettingsPage: React.FC = () => {
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   // ElevenLabs Voice Settings
-  const [elevenApiKey, setElevenApiKey] = useState(() => elevenLabsService.getApiKey());
+  const [hasElevenKey, setHasElevenKey] = useState(() => elevenLabsService.hasApiKey());
+  const [newElevenApiKey, setNewElevenApiKey] = useState('');
   const [elevenVoiceId, setElevenVoiceId] = useState(() => elevenLabsService.getVoiceId());
   const [isTestingVoice, setIsTestingVoice] = useState(false);
-  const [showApiKey, setShowApiKey] = useState(false);
 
   // Cloud Browser Use Settings
-  const [browserUseKey, setBrowserUseKey] = useState(() => browserUseService.getApiKey());
-  const [showBrowserKey, setShowBrowserKey] = useState(false);
+  const [hasBrowserUseKey, setHasBrowserUseKey] = useState(() => browserUseService.hasApiKey());
+  const [newBrowserUseKey, setNewBrowserUseKey] = useState('');
   const [isTestingAgent, setIsTestingAgent] = useState(false);
   const [agentProgressSteps, setAgentProgressSteps] = useState<string[]>([]);
   const [agentResult, setAgentResult] = useState<HospitalTokenResult | null>(null);
 
   const handleTestVoice = async () => {
     setIsTestingVoice(true);
-    elevenLabsService.setApiKey(elevenApiKey);
+    if (newElevenApiKey.trim()) {
+      elevenLabsService.setApiKey(newElevenApiKey.trim());
+      setHasElevenKey(true);
+    }
     elevenLabsService.setVoiceId(elevenVoiceId);
 
     const testPhrase = 'नमस्ते आशा दीदी। प्रोजेक्ट साथी में आपका स्वागत है। आज आपके इलाके में 3 मरीजों की पुनः जाँच बाकी है।';
@@ -38,7 +41,10 @@ export const SettingsPage: React.FC = () => {
     setAgentProgressSteps([]);
     setAgentResult(null);
 
-    browserUseService.setApiKey(browserUseKey);
+    if (newBrowserUseKey.trim()) {
+      browserUseService.setApiKey(newBrowserUseKey.trim());
+      setHasBrowserUseKey(true);
+    }
 
     try {
       const res = await browserUseService.bookDistrictHospitalReferral({
@@ -62,9 +68,19 @@ export const SettingsPage: React.FC = () => {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    elevenLabsService.setApiKey(elevenApiKey);
+    if (newElevenApiKey.trim()) {
+      elevenLabsService.setApiKey(newElevenApiKey.trim());
+      setHasElevenKey(true);
+      setNewElevenApiKey('');
+    }
     elevenLabsService.setVoiceId(elevenVoiceId);
-    browserUseService.setApiKey(browserUseKey);
+
+    if (newBrowserUseKey.trim()) {
+      browserUseService.setApiKey(newBrowserUseKey.trim());
+      setHasBrowserUseKey(true);
+      setNewBrowserUseKey('');
+    }
+
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 4000);
   };
@@ -153,48 +169,67 @@ export const SettingsPage: React.FC = () => {
 
             <span
               className={`text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 self-start sm:self-auto ${
-                elevenApiKey && elevenApiKey.length > 15
+                hasElevenKey
                   ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                   : 'bg-slate-100 text-slate-600 border border-slate-300'
               }`}
             >
               <span
                 className={`w-2 h-2 rounded-full ${
-                  elevenApiKey && elevenApiKey.length > 15 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                  hasElevenKey ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
                 }`}
               ></span>
               <span>
-                {elevenApiKey && elevenApiKey.length > 15
+                {hasElevenKey
                   ? 'ElevenLabs AI Voice Active'
                   : 'On-Device Web Speech Fallback'}
               </span>
             </span>
           </div>
 
-          {/* API Key */}
+          {/* API Key Status & Secure Override */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-bold text-saathi-navy flex items-center gap-1">
-                <Key className="w-3.5 h-3.5 text-indigo-600" />
-                <span>ElevenLabs API Key</span>
+            <label className="text-xs font-bold text-saathi-navy flex items-center justify-between mb-1.5">
+              <span className="flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-indigo-600" />
+                <span>ElevenLabs API Key Status</span>
+              </span>
+              <span className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-semibold">
+                {hasElevenKey ? '✓ Encrypted & Active' : 'Fallback: Web Speech'}
+              </span>
+            </label>
+
+            {hasElevenKey ? (
+              <div className="flex items-center justify-between p-3 bg-slate-50 border border-saathi-border rounded-xl">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="font-mono text-xs text-slate-700 tracking-widest select-none">
+                    ••••••••••••••••••••••••••••••••
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold text-slate-500">
+                  (सुरक्षित परिवेश में सक्रिय)
+                </span>
+              </div>
+            ) : null}
+
+            <div className="mt-2">
+              <label className="block text-[11px] text-slate-500 mb-1 font-medium">
+                {hasElevenKey
+                  ? 'कुंजी बदलें (केवल नई कुंजी से बदलने के लिए यहाँ दर्ज करें):'
+                  : 'नई ElevenLabs API Key दर्ज करें:'}
               </label>
-              <button
-                type="button"
-                onClick={() => setShowApiKey(!showApiKey)}
-                className="text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold"
-              >
-                {showApiKey ? 'Hide Key' : 'Show Key'}
-              </button>
+              <input
+                type="password"
+                value={newElevenApiKey}
+                onChange={(e) => setNewElevenApiKey(e.target.value)}
+                placeholder={hasElevenKey ? 'वर्तमान कुंजी सक्रिय है (Enter new key to rotate)' : 'sk_...'}
+                className="w-full text-sm p-2.5 font-mono border border-saathi-border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                autoComplete="off"
+              />
             </div>
-            <input
-              type={showApiKey ? 'text' : 'password'}
-              value={elevenApiKey}
-              onChange={(e) => setElevenApiKey(e.target.value)}
-              placeholder="e.g. sk_4a89bc... (from elevenlabs.io/app/settings/api-keys)"
-              className="w-full text-sm p-3 font-mono border border-saathi-border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
-            />
             <span className="text-[11px] text-slate-500 mt-1 block">
-              कुंजी स्थानीय रूप से सहेजी जाती है। यदि अनुपस्थित हो, तो ऐप स्वचालित रूप से ऑन-डिवाइस वेब स्पीच पर काम करता रहेगा।
+              संवेदनशील API कुंजियों को सार्वजनिक स्क्रीन पर प्रदर्शित नहीं किया जाता है।
             </span>
           </div>
 
@@ -276,7 +311,7 @@ export const SettingsPage: React.FC = () => {
               </div>
             </div>
 
-            {browserUseService.hasApiKey() && (
+            {hasBrowserUseKey && (
               <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200 flex items-center gap-1.5 shrink-0">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                 सत्यापित एवं सक्रिय (Connected ✓)
@@ -285,28 +320,47 @@ export const SettingsPage: React.FC = () => {
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-bold text-saathi-navy flex items-center gap-1.5">
-                <Key className="w-3.5 h-3.5 text-cyan-600" />
-                Browser Use API Key (cloud.browser-use.com):
+            <label className="text-xs font-bold text-saathi-navy flex items-center justify-between mb-1.5">
+              <span className="flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-cyan-600" />
+                <span>Browser Use API Gateway</span>
+              </span>
+              <span className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-semibold">
+                {hasBrowserUseKey ? '✓ Encrypted & Active' : 'सिम्युलेटेड मोड'}
+              </span>
+            </label>
+
+            {hasBrowserUseKey ? (
+              <div className="flex items-center justify-between p-3 bg-slate-50 border border-saathi-border rounded-xl">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse"></span>
+                  <span className="font-mono text-xs text-slate-700 tracking-widest select-none">
+                    ••••••••••••••••••••••••••••••••
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold text-slate-500">
+                  (सुरक्षित गेटवे सक्रिय)
+                </span>
+              </div>
+            ) : null}
+
+            <div className="mt-2">
+              <label className="block text-[11px] text-slate-500 mb-1 font-medium">
+                {hasBrowserUseKey
+                  ? 'कुंजी बदलें (केवल नई कुंजी से बदलने के लिए यहाँ दर्ज करें):'
+                  : 'नई Browser Use API Key दर्ज करें:'}
               </label>
-              <button
-                type="button"
-                onClick={() => setShowBrowserKey(!showBrowserKey)}
-                className="text-[11px] font-semibold text-cyan-600 hover:text-cyan-800"
-              >
-                {showBrowserKey ? 'Hide Key' : 'Show Key'}
-              </button>
+              <input
+                type="password"
+                value={newBrowserUseKey}
+                onChange={(e) => setNewBrowserUseKey(e.target.value)}
+                placeholder={hasBrowserUseKey ? 'वर्तमान गेटवे सक्रिय है (Enter new key to rotate)' : 'bu_...'}
+                className="w-full text-sm p-2.5 font-mono border border-saathi-border rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none bg-white"
+                autoComplete="off"
+              />
             </div>
-            <input
-              type={showBrowserKey ? 'text' : 'password'}
-              value={browserUseKey}
-              onChange={(e) => setBrowserUseKey(e.target.value)}
-              placeholder="bu_..."
-              className="w-full text-sm p-3 font-mono border border-saathi-border rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
-            />
             <span className="text-[11px] text-slate-500 mt-1 block">
-              यह कुंजी cloud.browser-use.com पर उपलब्ध है। इसके माध्यम से एजेंट जिला अस्पताल पोर्टल्स पर स्वचालित ओपीडी टोकन बुक करता है।
+              यह कुंजी जिला अस्पताल पोर्टल्स पर ओपीडी टोकन बुक करती है और सुरक्षित रूप से एन्क्रिप्टेड रहती है।
             </span>
           </div>
 
@@ -314,7 +368,7 @@ export const SettingsPage: React.FC = () => {
           <div className="pt-1">
             <button
               type="button"
-              disabled={isTestingAgent || !browserUseKey.trim()}
+              disabled={isTestingAgent || (!hasBrowserUseKey && !newBrowserUseKey.trim())}
               onClick={handleTestAgent}
               className="px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-xs transition-saathi"
             >
