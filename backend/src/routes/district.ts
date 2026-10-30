@@ -137,4 +137,34 @@ router.get(
   }
 );
 
+// Trigger & Inspect Render Workflows Pipeline (@renderinc/sdk/workflows)
+router.post('/run-workflow', async (req, res) => {
+  try {
+    const { runLocalWorkflow } = await import('../workflows/runWorkflowLocal.js');
+    const result = await runLocalWorkflow();
+    res.json({
+      success: true,
+      engine: 'Render Workflows (@renderinc/sdk/workflows)',
+      workflow: 'districtOutbreakWorkflow',
+      result,
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/workflow-info', (req, res) => {
+  res.json({
+    engine: 'Render Workflows',
+    sdk: '@renderinc/sdk/workflows',
+    tasks: [
+      { name: 'ingestOfflineSyncBatch', retries: 3, timeoutSeconds: 60 },
+      { name: 'applyDpdPrivacySuppression', retries: 2, timeoutSeconds: 45 },
+      { name: 'dispatchHighRiskReferrals', retries: 3, timeoutSeconds: 120 },
+      { name: 'generateDistrictAuditLedger', retries: 2, timeoutSeconds: 60 },
+      { name: 'districtOutbreakWorkflow', description: 'Master distributed DAG orchestrator' }
+    ]
+  });
+});
+
 export default router;

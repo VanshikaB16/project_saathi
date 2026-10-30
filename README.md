@@ -207,3 +207,25 @@ Project Saathi enforces the principle: **A screening flag is only the beginning.
 
 ## 10. Licensing & Provenance Notices
 Candidate research datasets referenced in demonstration adapters (HAM10000, EyePACS, MESSIDOR, NIH ChestX-ray14, ALL-IDB) have distinct research licenses. They are used exclusively to illustrate edge adapter interfaces and **do not constitute clinical validation for unmagnified smartphone rural screening**.
+
+---
+
+## 11. Render Workflows Distributed Orchestration Pipeline
+
+Project Saathi utilizes **Render Workflows** via the official `@renderinc/sdk/workflows` engine for long-running, durable, and distributed public health tasks:
+
+- **Ingest & Validation Task (`ingestOfflineSyncBatch`)**: Ingests and validates cryptographic hashes of offline sync batches from field ASHA workers.
+- **DPDP Act Small-Cell Suppression Task (`applyDpdPrivacySuppression`)**: Enforces privacy compliance by suppressing counts below 5 (`< 5`) in rural village clusters to prevent re-identification.
+- **Autonomous OPD Pre-Booking Task (`dispatchHighRiskReferrals`)**: Dispatches autonomous token booking for high-risk referrals to CHC hospitals via browser-use agents.
+- **District Epidemiological Ledger Task (`generateDistrictAuditLedger`)**: Writes tamper-evident audit blocks and recalculates district outbreak risk levels.
+
+### Running & Testing the Render Workflow
+```bash
+# From the backend directory:
+npm run workflow:run   # Executes the durable pipeline with full task trace
+npm test               # Automated test suite verifying the workflow
+```
+
+Live API endpoints:
+- `POST /api/district/run-workflow`: Triggers the pipeline via REST API
+- `GET /api/district/workflow-info`: Returns task metadata, retries, and timeout configuration
