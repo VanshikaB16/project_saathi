@@ -1,12 +1,19 @@
-## MOBILE APP (ASHA Worker & Doctor) - https://project-saathi-rho.vercel.app/app
-## Website (District Health Officer dashboard) - https://project-saathi-rho.vercel.app
-
-
-
 # Project Saathi | Healthcare Screening & Referral Platform
 
 > **"A little closer to care. A step earlier to health."**  
 > *Screen locally. Refer safely. Follow through until care is reached.*
+
+[![Render Workflows](https://img.shields.io/badge/Render%20Workflows-Durable%20Distributed%20DAG-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com)
+[![Render Blueprint](https://img.shields.io/badge/Render%20Blueprint-render.yaml-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com)
+[![DPDPA 2023 Compliant](https://img.shields.io/badge/DPDP%20Act-Small--Cell%20Suppression-008080?style=for-the-badge)](https://www.meity.gov.in)
+[![Offline-First](https://img.shields.io/badge/Architecture-Offline--First%20SQLite%20Sync-blue?style=for-the-badge)](https://sqlite.org)
+
+### 🌐 Live Production & Deployment Endpoints
+| Platform / Portal | Target User | URL |
+| :--- | :--- | :--- |
+| 📱 **Mobile Application** | ASHA Field Workers & CHC Doctors | **[project-saathi-rho.vercel.app/app](https://project-saathi-rho.vercel.app/app)** |
+| 💻 **Executive Command Center** | District Medical Officers (DMO) | **[project-saathi-rho.vercel.app](https://project-saathi-rho.vercel.app)** |
+| ⚙️ **Render Workflows Live Backend** | Automated Health Task Orchestration | **[project-saathi-api.onrender.com](https://project-saathi-api.onrender.com/health)** |
 
 ---
 
@@ -66,15 +73,20 @@ project-saathi/
 │   ├── package.json
 │   └── vite.config.ts
 │
-├── backend/                    # Node.js / TypeScript API & Sync Engine
+├── backend/                    # Node.js / TypeScript API & Render Workflows Engine
 │   ├── src/
+│   │   ├── workflows/          # Render Workflows durable task definitions (@renderinc/sdk)
+│   │   │   ├── districtOutbreakWorkflow.ts  # Master DAG orchestrator (4-step task pipeline)
+│   │   │   └── runWorkflowLocal.ts          # Local execution & CLI runner
 │   │   ├── models/             # 17 domain entities (Patients, Referrals, Audit, etc.)
 │   │   ├── routes/             # Auth, Patients, Screenings, Referrals, Sync, District
 │   │   ├── services/           # Pluggable SMS Adapter & Conflict Resolution Sync
 │   │   └── server.ts           # Express application server
 │   ├── security/               # Firestore and Storage security rules
 │   ├── migrations/             # SQL schema (PostgreSQL / SQLite)
-│   └── tests/                  # Node built-in API tests
+│   └── tests/                  # Automated workflow & API tests
+│
+├── render.yaml                 # Render Blueprint & Infrastructure-as-Code Configuration
 │
 ├── ml/                         # Applied ML Edge Subsystem
 │   ├── model_cards/            # Quantized INT8 model cards (Skin, DR, Chest, Smear)
@@ -212,20 +224,32 @@ Candidate research datasets referenced in demonstration adapters (HAM10000, EyeP
 
 ## 11. Render Workflows Distributed Orchestration Pipeline
 
-Project Saathi utilizes **Render Workflows** via the official `@renderinc/sdk/workflows` engine for long-running, durable, and distributed public health tasks:
+Project Saathi utilizes **Render Workflows** via the official `@renderinc/sdk/workflows` engine for long-running, durable, and distributed healthcare tasks:
 
-- **Ingest & Validation Task (`ingestOfflineSyncBatch`)**: Ingests and validates cryptographic hashes of offline sync batches from field ASHA workers.
-- **DPDP Act Small-Cell Suppression Task (`applyDpdPrivacySuppression`)**: Enforces privacy compliance by suppressing counts below 5 (`< 5`) in rural village clusters to prevent re-identification.
-- **Autonomous OPD Pre-Booking Task (`dispatchHighRiskReferrals`)**: Dispatches autonomous token booking for high-risk referrals to CHC hospitals via browser-use agents.
-- **District Epidemiological Ledger Task (`generateDistrictAuditLedger`)**: Writes tamper-evident audit blocks and recalculates district outbreak risk levels.
+```
+[Field Sync Ingest] ➔ [DPDP Small-Cell Mask] ➔ [Autonomous OPD Dispatch] ➔ [Audit Ledger & Risk Index]
+(ingestOfflineSyncBatch) (applyDpdPrivacySuppression) (dispatchHighRiskReferrals) (generateDistrictAuditLedger)
+```
+
+### The 4 Durable Workflow Tasks:
+1. **Ingest & Validation Task (`ingestOfflineSyncBatch`)**:
+   - Ingests and validates cryptographic hashes of offline sync batches from field ASHA workers.
+   - Fault-tolerant with `maxRetries: 3`, exponential backoff scaling `1.5`, and a 60s timeout.
+2. **DPDP Act Small-Cell Suppression Task (`applyDpdPrivacySuppression`)**:
+   - Enforces India's **Digital Personal Data Protection (DPDP) Act** by suppressing case counts below 5 (`< 5`) in rural village clusters to prevent demographic re-identification.
+3. **Autonomous OPD Pre-Booking Task (`dispatchHighRiskReferrals`)**:
+   - Dispatches autonomous token booking for high-risk referrals to Community Health Centres (CHCs) via cloud autonomous agents.
+4. **District Epidemiological Ledger Task (`generateDistrictAuditLedger`)**:
+   - Appends tamper-evident audit blocks (`AUDIT-BLK-...`) and dynamically recalculates the district epidemic risk level (`NORMAL`, `ELEVATED`, or `CRITICAL`).
 
 ### Running & Testing the Render Workflow
 ```bash
-# From the backend directory:
+# In the backend directory:
 npm run workflow:run   # Executes the durable pipeline with full task trace
 npm test               # Automated test suite verifying the workflow
 ```
 
-Live API endpoints:
-- `POST /api/district/run-workflow`: Triggers the pipeline via REST API
-- `GET /api/district/workflow-info`: Returns task metadata, retries, and timeout configuration
+### Live Render Endpoints
+- **Trigger Workflow**: `POST https://project-saathi-api.onrender.com/api/district/run-workflow`
+- **Workflow Task Metadata**: `GET https://project-saathi-api.onrender.com/api/district/workflow-info`
+- **Backend Health Check**: `GET https://project-saathi-api.onrender.com/health`
