@@ -6,7 +6,7 @@ services:
     plan: free
     region: oregon
     rootDir: backend
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /health
     autoDeploy: true
@@ -27,7 +27,7 @@ services:
     name: project-saathi-web
     runtime: static
     rootDir: dashboard
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     staticPublishPath: dist
     autoDeploy: true
     routes:
